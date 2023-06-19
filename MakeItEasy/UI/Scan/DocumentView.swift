@@ -10,14 +10,14 @@ import VisionKit
 import UIKit
 
 struct DocumentView: View {
-    @StateObject var viewModel: DocumentViewModel = DocumentViewModel()
+    @StateObject var document = Scanner()
     @State private var showDocumentScannerView = false
     
     var body: some View {
         ScrollView {
             LazyVStack {
-                ScannedImageView(scannedImage: $viewModel.scannedImage)
-                ForEach(viewModel.itemIDs, id: \.self) { itemID in
+                Text("scannedItemIDs Count = \(document.scannedItemIDs.count)")
+                ForEach(document.scannedItemIDs, id: \.self) { itemID in
                     Text(itemID)
                 }
             }
@@ -26,7 +26,8 @@ struct DocumentView: View {
             ScanButton()
                 .sheet(isPresented: $showDocumentScannerView) {
                     ScanViewController()
-                        .environmentObject(viewModel)
+                        .environmentObject(document)
+                        
                 }
         }
     }
@@ -37,22 +38,6 @@ struct DocumentView: View {
         } label: {
             UI.Constant.ScanButton()
             
-        }
-    }
-}
-
-// SubViews of Document View
-extension DocumentView {
-    struct ScannedImageView: View {
-        @Binding var scannedImage: UIImage?
-        var body: some View {
-            if let scannedImage {
-                Image(uiImage: scannedImage)
-                    .resizable()
-                    .scaledToFit()
-            } else {
-                Image(systemName: "doc.plaintext.fill")
-            }
         }
     }
 }

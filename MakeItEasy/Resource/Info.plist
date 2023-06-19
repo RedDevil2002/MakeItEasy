@@ -6,7 +6,5 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>MakeItEasy requires access to yourr phone&apos;s camera</string>
 </dict>
 </plist>

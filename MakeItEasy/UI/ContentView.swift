@@ -9,27 +9,16 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @StateObject var downloadManager = DownloadManager()
+    @StateObject var priceChangeLogManager = PriceChangeLogManager()
     
     var body: some View {
-        Group {
-            TabView {
-                DocumentView()
-                    .tabItem {
-                        Image(systemName: "doc.viewfinder.fill")
-                            .renderingMode(.template)
-                            
-                    }
-                ProductListView(products: downloadManager.allProducts)
-                    .tabItem {
-                        Image(systemName: "doc.circle.fill")
-                            .renderingMode(.template)
-                            
-                    }
+        PriceChangeLogView()
+            .environmentObject(priceChangeLogManager)
+            .tabItem {
+                Image(systemName: "doc.circle.fill")
+                    .renderingMode(.template)
+
             }
-            .foregroundColor(.primary)
-            .tint(.primary)
-        }
     }
 }
 

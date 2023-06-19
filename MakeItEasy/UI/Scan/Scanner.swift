@@ -9,10 +9,12 @@ import UIKit
 import Vision
 import RegexBuilder
 import CoreData
+import OSLog
 
-class DocumentViewModel: ObservableObject {
+class Scanner: ObservableObject {
+    private let logger = Logger(subsystem: "com.devil.red.MakeItEasy", category: "Scanner")
     @Published var scannedImage: UIImage?
-    @Published var itemIDs: [String] = []
+    @Published var scannedItemIDs: [String] = []
     
     var request: VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest { (request, error) in
@@ -23,12 +25,11 @@ class DocumentViewModel: ObservableObject {
                 let scannedText = topCandidate.string
                 
                 if let itemID = self.parseItemID(scannedText) {
-                    self.itemIDs.append(itemID)
+                    self.logger.debug("scanned itemID \(itemID)")
+                    self.scannedItemIDs.append(itemID)
                 }
             }
-            print(self.itemIDs)
-        }
-        
+        }        
         request.recognitionLevel = .accurate
         request.recognitionLanguages = ["en-US", "en-GB"]
         request.usesLanguageCorrection = true
@@ -58,7 +59,7 @@ class DocumentViewModel: ObservableObject {
     }
 }
 
-extension DocumentViewModel {
+extension Scanner {
     private func parseItemID(_ scannedText: String) -> String? {
         let components = scannedText.components(separatedBy: " ")
         if components.count == 2 {

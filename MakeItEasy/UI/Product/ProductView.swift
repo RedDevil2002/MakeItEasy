@@ -8,14 +8,24 @@
 import SwiftUI
 
 struct ProductView: View {
-    let product: Product
+    let product: Product?
+    
+    var imageLinks: [String] {
+        guard let imageLinks = product?.imageLinks else { return [] }
+        return imageLinks
+            .filter { !$0.hasSuffix(".gif") }
+            .sorted { x, y in
+                if x.hasSuffix("X.jpg") {
+                    return true
+                } else if y.hasSuffix("X.jpg") {
+                    return false
+                } else {
+                    return x < y
+                }
+            }
+    }
     
     var bestDescriptionLink: String? {
-        let imageLinks = product.imageLinks
-        if let link = imageLinks.first(where: { $0.hasSuffix("XXX.jpg")}) {
-            return link
-        }
-        
         if let link = imageLinks.first {
             return link
         }
@@ -24,7 +34,11 @@ struct ProductView: View {
     
     var body: some View {
         NavigationLink {
-            ProductDetailView(product: product)
+            if let product {
+                ProductDetailView(itemID: product.itemID,imageLinks: imageLinks)
+            } else {
+                EmptyView()
+            }
         } label: {
             if let link = bestDescriptionLink {
                 AsyncImage(url: URL(string: link)) { image in

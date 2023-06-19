@@ -13,7 +13,7 @@ import UIKit
 import AVKit
 
 struct ScanViewController: UIViewControllerRepresentable {
-    @EnvironmentObject var viewModel: DocumentViewModel
+    @EnvironmentObject var document: Scanner
     
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let viewController = VNDocumentCameraViewController()
@@ -26,25 +26,27 @@ struct ScanViewController: UIViewControllerRepresentable {
     
     func makeCoordinator() -> Coordinator {
         //Coordinator is Apple bridge between SwiftUI and ViewController
-        return Coordinator(viewModel) // this basically call init of the UIViewControllerRepresentable above`
+        return Coordinator(document) // this basically call init of the UIViewControllerRepresentable above`
     }
     
     typealias UIViewControllerType = VNDocumentCameraViewController
     
     final class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         @Environment(\.presentationMode) var presentationMode
-        @ObservedObject var viewModel: DocumentViewModel
+        @ObservedObject var document: Scanner
         
-        init(_ viewModel: DocumentViewModel) {
-            self.viewModel = viewModel
+        init(_ document: Scanner) {
+            self.document = document
         }
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
             guard scan.pageCount > 0 else {
                 controller.dismiss(animated: true)
                 return
             }
-            self.viewModel.scannedImage = scan.imageOfPage(at: 0)
-            self.viewModel.scan(scan.imageOfPage(at: 0))
+            for index in 0..<scan.pageCount {
+                self.document.scan(scan.imageOfPage(at: index))
+            }
+            
             controller.dismiss(animated: true)
         }
         
