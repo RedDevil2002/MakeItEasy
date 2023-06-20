@@ -9,43 +9,54 @@ import SwiftUI
 
 struct PriceChangeLogView: View {
     @StateObject var priceChangeLogManager = PriceChangeLogManager()
+    
     @StateObject var scanner = Scanner()
     @State private var showDocumentScannerView = false
-    @State private var products: [Product?] = []
+    @State private var viewModels: [ProductViewModel] = []
+    
+    @State private var brands = [String]()
+//    ["Absolute Canada", "adidas", "Baffin", "Bench", "Birkenstock", "Blondo Canada", "Blowfish Malibu", "Blundstone", "Bogs", "Champs", "Clarks", "Co-Lab", "Columbia", "Converse", "Cougar", "Crocs", "Dr Martens", "Duray", "Fjallraven", "Fraas", "Glerups", "Gredico- NHL", "HEYDUDE", "Hot Sox", "Hunter", "JanSport", "Josef Seibel", "K Bell", "K-SWISS", "Kamik", "Keds", "Keen", "Lacoste", "Mephisto", "Merrell", "Moneysworth & Best", "Olang", "OOFOS", "Puma", "Reebok", "Reef", "Roemers", "Romika", "Roots", "Royal Canadian", "Skechers", "Skechers Work", "Sof Sole", "SoftMoc", "SoftMoc Gift Card", "SoftMoc Shoe Care", "Sorel", "Sperry", "Steve Madden", "Superga", "Teva", "Timberland", "UGG", "Vans", "Vionic", "Volant James"]
     
     var body: some View {
         List {
-            ForEach(products, id: \.self) { product in
+            ForEach(brands, id: \.self) { brand in
                 Section {
-                    NavigationLink {
-                        ProductDetailView(itemID: (product?.itemID).unwrapped, imageLinks: product?.imageLinks ?? [])
-                    } label: {
-                        ProductView(product: product)
-                            .padding()
+                    ForEach(viewModels.filter{ $0.brand == brand }, id: \.itemID) { viewModel in
+                        ProductView()
+                            .environmentObject(viewModel)
                             .frame(width: 400, height: 400)
+                            .tag(viewModel.itemID)
                     }
                 } header: {
-                    Text((product?.brand).unwrapped).bold()
-                        .accessibilityLabel(Text("Brand"))
-                } footer: {
-                    Text((product?.itemID).unwrapped).bold()
-                        .accessibilityLabel(Text("Item ID"))
+                    Text(brand)
                 }
             }
         }
-        .navigationTitle(Text("\(self.products.count)"))
-        .refreshable {
-            Task {
-                self.products = scanner.scannedItemIDs.map{ priceChangeLogManager.productCatalogue[$0] ?? Product(itemID: $0, brand: "No Brand", imageLinks: []) }
-            }
+        .task {
+            // if product informations are not loaded, load it
+            self.load()
         }
+        .refreshable {
+            viewModels = scanner.scannedItemIDs.map{ ProductViewModel(itemID: $0.lowercased()) }
+            let uniqueBrands = Set(viewModels.map{ $0.brand })
+            brands = Array(uniqueBrands).sorted()
+        }
+        .navigationTitle(Text("\(self.viewModels.count)"))
         .overlay(alignment: .bottom) {
             ScanButton()
                 .sheet(isPresented: $showDocumentScannerView) {
                     ScanViewController()
                         .environmentObject(scanner)
                 }
-            
+        }
+    }
+        
+    private func load() {
+        let loadingComplete = UserDefaults.standard.bool(forKey: "LoadingComplete")
+        if !loadingComplete {
+            Task {
+                await priceChangeLogManager.parseProductObjectFile(forResource: "productInfos", withExtension: "json")
+            }
         }
     }
     
@@ -62,5 +73,11 @@ struct PriceChangeLogView: View {
 extension Optional<String> {
     var unwrapped: String {
         return self ?? ""
+    }
+}
+
+extension String {
+    var brand: String {
+        return UserDefaults.standard.string(forKey: self) ?? "No Brand"
     }
 }

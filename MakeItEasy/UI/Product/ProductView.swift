@@ -8,25 +8,10 @@
 import SwiftUI
 
 struct ProductView: View {
-    let product: Product?
-    
-    var imageLinks: [String] {
-        guard let imageLinks = product?.imageLinks else { return [] }
-        return imageLinks
-            .filter { !$0.hasSuffix(".gif") }
-            .sorted { x, y in
-                if x.hasSuffix("X.jpg") {
-                    return true
-                } else if y.hasSuffix("X.jpg") {
-                    return false
-                } else {
-                    return x < y
-                }
-            }
-    }
+    @EnvironmentObject var viewModel: ProductViewModel
     
     var bestDescriptionLink: String? {
-        if let link = imageLinks.first {
+        if let link = viewModel.sources.first {
             return link
         }
         return nil
@@ -34,32 +19,35 @@ struct ProductView: View {
     
     var body: some View {
         NavigationLink {
-            if let product {
-                ProductDetailView(itemID: product.itemID,imageLinks: imageLinks)
-            } else {
-                EmptyView()
-            }
+            ProductDetailView()
+                .environmentObject(viewModel)
         } label: {
-            if let link = bestDescriptionLink {
-                AsyncImage(url: URL(string: link)) { image in
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 350, height: 350)
-                        .padding()
-                } placeholder: {
-                    ProgressView()
+            VStack {
+                if let link = bestDescriptionLink {
+                    AsyncImage(url: URL(string: link)) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                    } placeholder: {
+                        ProgressView()
+                            .scaledToFit()
+                    }
                 }
-                .frame(width: 350, height: 350)
+            }
+            .frame(width: 350, height: 350)
+            .overlay(alignment: .bottom) {
+                Text(viewModel.itemID.uppercased()).bold()
             }
         }
-
     }
 }
 
 struct ProductView_Previews: PreviewProvider {
     
     static var previews: some View {
-        ProductView(product: Product(itemID: "531", brand: "Birkenstock", imageLinks: ["A", "B", "C"]))
+        let viewModel: ProductViewModel = ProductViewModel(itemID: "585")
+        ProductView()
+            .environmentObject(viewModel)
     }
 }

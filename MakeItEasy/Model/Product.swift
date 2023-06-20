@@ -12,5 +12,5 @@ import Combine
 struct Product: Decodable, Hashable {
     let itemID: String
     let brand: String
-    let imageLinks: [String]
+    let sources: [String]
 }

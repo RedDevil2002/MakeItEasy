@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct ProductDetailView: View {
-    let itemID: String
-    let imageLinks: [String]
+    @EnvironmentObject var viewModel: ProductViewModel
+    
+    @State private var sources: [String] = []
     
     var body: some View {
-        VStack {
+        VStack(alignment: .center) {
+            HStack {
+                Spacer()
+                TextField("", text: $viewModel.itemID)
+                Spacer()
+            }
             TabView {
-                ForEach(imageLinks, id: \.self) { link in
+                ForEach(sources, id: \.self) { link in
                     VStack {
                         AsyncImage(url: URL(string: link)) { image in
                             image
@@ -28,7 +34,10 @@ struct ProductDetailView: View {
                     }
                 }
             }
-            Text(itemID)
+            .onReceive(viewModel.$itemID) { newItemID in
+                print(newItemID, viewModel.sources)
+                sources = viewModel.sources
+            }
         }
         .tabViewStyle(.page)
     }
@@ -36,6 +45,8 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductDetailView(itemID: "531", imageLinks: ["A", "B", "C"])
+        let viewModel: ProductViewModel = ProductViewModel(itemID: "585")
+        ProductDetailView()
+            .environmentObject(viewModel)
     }
 }
