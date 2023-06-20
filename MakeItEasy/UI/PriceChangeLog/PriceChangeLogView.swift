@@ -6,36 +6,39 @@
 //
 
 import SwiftUI
+import Combine
 
 struct PriceChangeLogView: View {
+    // ViewContext passed down from the MakeItEasyApp file as an Environment Variable
     @Environment(\.managedObjectContext) var viewContext
-    @StateObject var priceChangeLogManager = PriceChangeLogManager()
-    
-    @StateObject var scanner = Scanner()
-    @State private var showDocumentScannerView = false
-    
     @SectionedFetchRequest<Optional<String>, Product>(
         sectionIdentifier: \.brand,
         sortDescriptors: [SortDescriptor(\.brand)]
     )
     private var products: SectionedFetchResults<Optional<String>, Product>
     
+    @StateObject var scanner = Scanner()
+    @State private var showDocumentScannerView = false
+    
     var body: some View {
-        List(products) { section in
-            Section(header: Text(section.id.unwrapped)) {
-                ForEach(section) { product in
-                    ProductView(product: product)
-                        .frame(width: 400, height: 400)
+        ScrollView {
+            LazyVStack(pinnedViews: [.sectionHeaders]) {
+                ForEach(products) { section in
+                    Section(header: Text(section.id.unwrapped).bold().font(.title2)) {
+                        ForEach(section) { product in
+                            ProductView(product: product)
+                        }
+                    }
+                    .headerProminence(.increased)
                 }
             }
-            .headerProminence(.increased)
-            .
         }
-        .task {
-            // if product informations are not loaded, load it
-            self.load()
+        .refreshable {
+            let levenshtein = Levenshtein()
+            await levenshtein.getAllItems()
+            products.nsPredicate = NSPredicate(format: "itemID in %@", scanner.scannedItemIDs.compactMap{ levenshtein.closestString(to: $0,in: levenshtein.items)} )
         }
-        .navigationTitle(Text("\(self.products.count)"))
+        .navigationTitle(Text("Price Change Log"))
         .overlay(alignment: .bottom) {
             ScanButton()
                 .sheet(isPresented: $showDocumentScannerView) {
@@ -44,34 +47,21 @@ struct PriceChangeLogView: View {
                 }
         }
     }
-        
-    private func load() {
-        let loadingComplete = UserDefaults.standard.bool(forKey: "LoadingComplete")
-        if !loadingComplete {
-            Task {
-                await priceChangeLogManager.parseProductObjectFile(forResource: "productInfos", withExtension: "json")
-            }
-        }
-    }
-    
+
+    // ScanButton, when clicked on, shows the document scanner
     private func ScanButton() -> some View {
         Button {
             showDocumentScannerView.toggle()
         } label: {
             UI.Constant.ScanButton()
-            
         }
     }
 }
 
+// return self ?? ""
 extension Optional<String> {
     var unwrapped: String {
         return self ?? ""
     }
 }
 
-extension String {
-    var brand: String {
-        return UserDefaults.standard.string(forKey: self) ?? "No Brand"
-    }
-}

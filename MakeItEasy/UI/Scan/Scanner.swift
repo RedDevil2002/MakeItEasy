@@ -13,8 +13,8 @@ import OSLog
 
 class Scanner: ObservableObject {
     private let logger = Logger(subsystem: "com.devil.red.MakeItEasy", category: "Scanner")
-    @Published var scannedImage: UIImage?
     @Published var scannedItemIDs: [String] = []
+    var AllItemIDs: [String] = []
     
     var request: VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest { (request, error) in
@@ -26,7 +26,7 @@ class Scanner: ObservableObject {
                 
                 if let itemID = self.parseItemID(scannedText) {
                     self.logger.debug("scanned itemID \(itemID)")
-                    self.scannedItemIDs.append(itemID)
+                    self.scannedItemIDs.append(itemID.uppercased())
                 }
             }
         }        
@@ -49,7 +49,7 @@ class Scanner: ObservableObject {
     
     private func processImage(_ image: UIImage) {
         guard let cgImage = image.cgImage else { return }
-        
+
         let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
         do {
             try requestHandler.perform([self.request])

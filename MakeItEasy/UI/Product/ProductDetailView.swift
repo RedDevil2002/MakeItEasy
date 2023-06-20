@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct ProductDetailView: View {
+    @Environment(\.managedObjectContext) var viewContext
     @ObservedObject var product: Product
+    @State private var itemID: String
+    
+    init(product: Product) {
+        self.product = product
+        self.itemID = product.itemID.unwrapped
+    }
     
     var sources: [String] {
         if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
-            return sources
+            return sources.map{ $0.uppercased() }.filter{ $0.contains(product.itemID.unwrapped.uppercased) }
         }
         return []
     }
@@ -21,7 +28,11 @@ struct ProductDetailView: View {
         VStack(alignment: .center) {
             HStack {
                 Spacer()
-//                TextField("", text: product.itemID)
+                TextField("", text: $itemID)
+                    .onChange(of: itemID) { newValue in
+                        self.product.itemID = newValue
+                        try? viewContext.save()
+                    }
                 Spacer()
             }
             TabView {
@@ -41,6 +52,7 @@ struct ProductDetailView: View {
             }
         }
         .tabViewStyle(.page)
+        
     }
 }
 

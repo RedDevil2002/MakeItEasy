@@ -9,23 +9,22 @@ import SwiftUI
 
 struct ProductView: View {
     @ObservedObject var product: Product
-    
     var bestDescriptionLink: String? {
         if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
-            return sources.first
+            return sources.map{ $0.uppercased() }.filter{ $0.contains(product.itemID.unwrapped.uppercased) }.first
         }
         return nil
     }
-    
     var body: some View {
-        NavigationLink {
-            ProductDetailView(product: product)
-        } label: {
-            VStack {
+        VStack {
+            NavigationLink {
+                ProductDetailView(product: product)
+            } label: {
                 if let link = bestDescriptionLink {
                     AsyncImage(url: URL(string: link)) { image in
                         image
                             .resizable()
+                            .cornerRadius(15.0)
                             .scaledToFit()
                             .padding()
                     } placeholder: {
@@ -34,11 +33,17 @@ struct ProductView: View {
                     }
                 }
             }
-            .frame(width: 350, height: 350)
-            .overlay(alignment: .bottom) {
-                Text(product.itemID.unwrapped.uppercased()).bold()
+            .padding()
+
+            HStack {
+                Spacer()
+                Text(product.itemID.unwrapped.uppercased())
+                    .bold()
+                    .foregroundColor(.primary)
+                Spacer()
             }
         }
+        .frame(height: 400)
     }
 }
 

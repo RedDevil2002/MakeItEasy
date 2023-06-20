@@ -9,13 +9,13 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @StateObject var priceChangeLogManager = PriceChangeLogManager()
+    @StateObject var priceChangeLogManager = ProductInfoParser()
     
     var body: some View {
         PriceChangeLogView()
             .environmentObject(priceChangeLogManager)
             .tabItem {
-                Image(systemName: "doc.circle.fill")
+                Image(systemName: "tag.circle.fill")
                     .renderingMode(.template)
 
             }
