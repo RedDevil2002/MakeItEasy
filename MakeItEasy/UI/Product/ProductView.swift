@@ -8,19 +8,18 @@
 import SwiftUI
 
 struct ProductView: View {
-    @EnvironmentObject var viewModel: ProductViewModel
+    @ObservedObject var product: Product
     
     var bestDescriptionLink: String? {
-        if let link = viewModel.sources.first {
-            return link
+        if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
+            return sources.first
         }
         return nil
     }
     
     var body: some View {
         NavigationLink {
-            ProductDetailView()
-                .environmentObject(viewModel)
+            ProductDetailView(product: product)
         } label: {
             VStack {
                 if let link = bestDescriptionLink {
@@ -37,7 +36,7 @@ struct ProductView: View {
             }
             .frame(width: 350, height: 350)
             .overlay(alignment: .bottom) {
-                Text(viewModel.itemID.uppercased()).bold()
+                Text(product.itemID.unwrapped.uppercased()).bold()
             }
         }
     }
@@ -46,8 +45,10 @@ struct ProductView: View {
 struct ProductView_Previews: PreviewProvider {
     
     static var previews: some View {
-        let viewModel: ProductViewModel = ProductViewModel(itemID: "585")
-        ProductView()
-            .environmentObject(viewModel)
+        let product = Product(context: PersistenceController.preview.container.viewContext)
+        product.itemID = "585"
+        product.brand = "blundstone"
+        product.sources = nil
+        return ProductView(product: product)
     }
 }

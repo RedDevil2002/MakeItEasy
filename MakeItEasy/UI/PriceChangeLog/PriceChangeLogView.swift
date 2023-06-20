@@ -8,40 +8,34 @@
 import SwiftUI
 
 struct PriceChangeLogView: View {
+    @Environment(\.managedObjectContext) var viewContext
     @StateObject var priceChangeLogManager = PriceChangeLogManager()
     
     @StateObject var scanner = Scanner()
     @State private var showDocumentScannerView = false
-    @State private var viewModels: [ProductViewModel] = []
     
-    @State private var brands = [String]()
-//    ["Absolute Canada", "adidas", "Baffin", "Bench", "Birkenstock", "Blondo Canada", "Blowfish Malibu", "Blundstone", "Bogs", "Champs", "Clarks", "Co-Lab", "Columbia", "Converse", "Cougar", "Crocs", "Dr Martens", "Duray", "Fjallraven", "Fraas", "Glerups", "Gredico- NHL", "HEYDUDE", "Hot Sox", "Hunter", "JanSport", "Josef Seibel", "K Bell", "K-SWISS", "Kamik", "Keds", "Keen", "Lacoste", "Mephisto", "Merrell", "Moneysworth & Best", "Olang", "OOFOS", "Puma", "Reebok", "Reef", "Roemers", "Romika", "Roots", "Royal Canadian", "Skechers", "Skechers Work", "Sof Sole", "SoftMoc", "SoftMoc Gift Card", "SoftMoc Shoe Care", "Sorel", "Sperry", "Steve Madden", "Superga", "Teva", "Timberland", "UGG", "Vans", "Vionic", "Volant James"]
+    @SectionedFetchRequest<Optional<String>, Product>(
+        sectionIdentifier: \.brand,
+        sortDescriptors: [SortDescriptor(\.brand)]
+    )
+    private var products: SectionedFetchResults<Optional<String>, Product>
     
     var body: some View {
-        List {
-            ForEach(brands, id: \.self) { brand in
-                Section {
-                    ForEach(viewModels.filter{ $0.brand == brand }, id: \.itemID) { viewModel in
-                        ProductView()
-                            .environmentObject(viewModel)
-                            .frame(width: 400, height: 400)
-                            .tag(viewModel.itemID)
-                    }
-                } header: {
-                    Text(brand)
+        List(products) { section in
+            Section(header: Text(section.id.unwrapped)) {
+                ForEach(section) { product in
+                    ProductView(product: product)
+                        .frame(width: 400, height: 400)
                 }
             }
+            .headerProminence(.increased)
+            .
         }
         .task {
             // if product informations are not loaded, load it
             self.load()
         }
-        .refreshable {
-            viewModels = scanner.scannedItemIDs.map{ ProductViewModel(itemID: $0.lowercased()) }
-            let uniqueBrands = Set(viewModels.map{ $0.brand })
-            brands = Array(uniqueBrands).sorted()
-        }
-        .navigationTitle(Text("\(self.viewModels.count)"))
+        .navigationTitle(Text("\(self.products.count)"))
         .overlay(alignment: .bottom) {
             ScanButton()
                 .sheet(isPresented: $showDocumentScannerView) {

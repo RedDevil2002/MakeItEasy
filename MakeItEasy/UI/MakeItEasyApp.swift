@@ -15,6 +15,7 @@ struct MakeItEasyApp: App {
         WindowGroup {
             NavigationView {
                 PriceChangeLogView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
             }
         }
     }

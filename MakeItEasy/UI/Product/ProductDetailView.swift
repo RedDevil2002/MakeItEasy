@@ -8,15 +8,20 @@
 import SwiftUI
 
 struct ProductDetailView: View {
-    @EnvironmentObject var viewModel: ProductViewModel
+    @ObservedObject var product: Product
     
-    @State private var sources: [String] = []
+    var sources: [String] {
+        if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
+            return sources
+        }
+        return []
+    }
     
     var body: some View {
         VStack(alignment: .center) {
             HStack {
                 Spacer()
-                TextField("", text: $viewModel.itemID)
+//                TextField("", text: product.itemID)
                 Spacer()
             }
             TabView {
@@ -34,10 +39,6 @@ struct ProductDetailView: View {
                     }
                 }
             }
-            .onReceive(viewModel.$itemID) { newItemID in
-                print(newItemID, viewModel.sources)
-                sources = viewModel.sources
-            }
         }
         .tabViewStyle(.page)
     }
@@ -45,8 +46,10 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel: ProductViewModel = ProductViewModel(itemID: "585")
-        ProductDetailView()
-            .environmentObject(viewModel)
+        let product = Product(context: PersistenceController.preview.container.viewContext)
+        product.itemID = "585"
+        product.brand = "blundstone"
+        product.sources = nil
+        return ProductDetailView(product: product)
     }
 }

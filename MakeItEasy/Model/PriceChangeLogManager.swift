@@ -5,36 +5,38 @@
 //  Created by Brian Seo on 2023-06-13.
 //
 import Foundation
-import Combine
 import OSLog
+import CoreData
 
 class PriceChangeLogManager: ObservableObject {
     private let logger: Logger = Logger(subsystem: "com.devil.red.MakeItEasy", category: "PriceChangeLogManager")
-    private var cancellables: Set<AnyCancellable> = []
-    
     var document = Scanner()
-//    @Published var scannedProducts: [Product?] = []
         
     func parseProductObjectFile(forResource name: String, withExtension ext: String) async {
         guard let fileURL = Bundle(for: type(of: self)).url(forResource: name, withExtension: ext) else { return }
         guard let data = try? Data(contentsOf: fileURL) else { return }
-        guard let products = try? JSONDecoder().decode([Product].self, from: data) else { return }
+        guard let products = try? JSONDecoder().decode([ProductInfo].self, from: data) else { return }
         
-        for product in products {
-            if let productInfo = try? JSONEncoder().encode(ProductInfo(brand: product.brand, sources: product.sources)) {
-                UserDefaults.standard.set(productInfo, forKey: product.itemID.uppercased())
+        var iterator = products.makeIterator()
+        let encoder = JSONEncoder()
+        
+        await PersistenceController.shared.container.performBackgroundTask { context in
+            let batchInsert = NSBatchInsertRequest(entity: Product.entity()) { (object: NSManagedObject) in
+                guard let nextProduct = iterator.next() else { return true }
+                if let product = object as? Product {
+                    // save itemID in upper case
+                    product.itemID = nextProduct.itemID.uppercased()
+                    product.brand = nextProduct.brand
+                    product.sources = try? encoder.encode(nextProduct.sources)
+                }
+                return false
             }
-        }
-        UserDefaults.standard.set(true, forKey: "LoadingComplete")
-    }
-    
-    init() {
-        
-    }
-    
-    deinit {
-        for cancellable in cancellables {
-            cancellable.cancel()
+            do {
+                try context.execute(batchInsert)
+            } catch {
+                self.logger.debug("Error executing product batch insert")
+            }
+            UserDefaults.standard.set(true, forKey: "LoadingComplete")
         }
     }
 }
