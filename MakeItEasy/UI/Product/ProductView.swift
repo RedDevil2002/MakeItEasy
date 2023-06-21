@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ProductView: View {
+    // ViewContext passed down from the MakeItEasyApp file as an Environment Variable
+    @Environment(\.managedObjectContext) var viewContext
+    
     @ObservedObject var product: Product
     var bestDescriptionLink: String? {
         if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
@@ -30,11 +33,10 @@ struct ProductView: View {
                     } placeholder: {
                         ProgressView()
                             .scaledToFit()
+                            .padding()
                     }
                 }
             }
-            .padding()
-
             HStack {
                 Spacer()
                 Text(product.itemID.unwrapped.uppercased())
@@ -44,6 +46,11 @@ struct ProductView: View {
             }
         }
         .frame(height: 400)
+        .onLongPressGesture {
+            product.completed.toggle()
+            try? viewContext.save()
+        }
+        
     }
 }
 

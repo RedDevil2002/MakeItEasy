@@ -33,6 +33,7 @@ struct ProductDetailView: View {
                         self.product.itemID = newValue
                         try? viewContext.save()
                     }
+                    .multilineTextAlignment(.center)
                 Spacer()
             }
             TabView {
@@ -41,12 +42,19 @@ struct ProductDetailView: View {
                         AsyncImage(url: URL(string: link)) { image in
                             image
                                 .resizable()
+                                .cornerRadius(15.0)
                                 .scaledToFit()
                                 .frame(width: 350, height: 350)
                         } placeholder: {
                             ProgressView()
                         }
-                        Text(link)
+                    }
+                    .contextMenu {
+                        Button {
+                            
+                        } label: {
+                            Text(link.lowercased())
+                        }
                     }
                 }
             }

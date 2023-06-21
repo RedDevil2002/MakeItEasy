@@ -12,6 +12,7 @@
 		86409A3B2A4001EF00539E3A /* productInfos.json in Resources */ = {isa = PBXBuildFile; fileRef = 86409A3A2A4001EF00539E3A /* productInfos.json */; };
 		864703372A4241F5006C16D9 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864703362A4241F5006C16D9 /* SettingView.swift */; };
 		864703392A425FDD006C16D9 /* Levenshtein.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864703382A425FDD006C16D9 /* Levenshtein.swift */; };
+		8647033B2A427AEC006C16D9 /* CompletedPriceLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8647033A2A427AEC006C16D9 /* CompletedPriceLogView.swift */; };
 		8674E60C2A38F567000F46DA /* UI.Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8674E60B2A38F567000F46DA /* UI.Constant.swift */; };
 		868266B92A40F98D0094126B /* ProductViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868266B82A40F98D0094126B /* ProductViewModel.swift */; };
 		8682CB072A38419A00E6AB4A /* MakeItEasyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682CB062A38419A00E6AB4A /* MakeItEasyApp.swift */; };
@@ -63,6 +64,7 @@
 		86409A3A2A4001EF00539E3A /* productInfos.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = productInfos.json; path = MakeItEasy/productInfos.json; sourceTree = SOURCE_ROOT; };
 		864703362A4241F5006C16D9 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		864703382A425FDD006C16D9 /* Levenshtein.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Levenshtein.swift; sourceTree = "<group>"; };
+		8647033A2A427AEC006C16D9 /* CompletedPriceLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedPriceLogView.swift; sourceTree = "<group>"; };
 		8674E60B2A38F567000F46DA /* UI.Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI.Constant.swift; sourceTree = "<group>"; };
 		868266B82A40F98D0094126B /* ProductViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewModel.swift; sourceTree = "<group>"; };
 		8682CB032A38419A00E6AB4A /* MakeItEasy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeItEasy.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				860EB9192A39074000FB336B /* PriceChangeLogView.swift */,
+				8647033A2A427AEC006C16D9 /* CompletedPriceLogView.swift */,
 			);
 			path = PriceChangeLog;
 			sourceTree = "<group>";
@@ -389,6 +392,7 @@
 				8682CB492A38E6C500E6AB4A /* ProductDetailView.swift in Sources */,
 				8682CB132A38419B00E6AB4A /* MakeItEasy.xcdatamodeld in Sources */,
 				8682CB402A38447800E6AB4A /* ProductInfo.swift in Sources */,
+				8647033B2A427AEC006C16D9 /* CompletedPriceLogView.swift in Sources */,
 				8682CB102A38419B00E6AB4A /* Persistence.swift in Sources */,
 				8674E60C2A38F567000F46DA /* UI.Constant.swift in Sources */,
 				864703372A4241F5006C16D9 /* SettingView.swift in Sources */,

@@ -120,6 +120,7 @@ struct CircularProgress: View {
                     .foregroundColor(.primary)
             }
             .disabled(progress != 1.0)
+            .opacity(progress != 1.0 ? 0.0: 1.0)
         }
     }
 }

@@ -9,16 +9,15 @@ import SwiftUI
 
 struct UI {
     struct Constant {
-        static func ScanButton() -> some View {
+        static func ScanButton(_ color: Color) -> some View {
             ZStack {
                 Circle()
-                    .strokeBorder(.primary, lineWidth: 3)
+                    .strokeBorder(color, lineWidth: 3)
                     .frame(width: 62, height: 62)
                 Circle()
-                    .fill(.primary)
+                    .fill(color)
                     .frame(width: 50, height: 50)
             }
-            .foregroundColor(.primary)
         }
     }
 }

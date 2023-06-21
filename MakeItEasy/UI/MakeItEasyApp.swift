@@ -15,6 +15,18 @@ struct MakeItEasyApp: App {
         WindowGroup {
             TabView {
                 NavigationView {
+                    CompletedPriceLogView()
+                        .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                }
+                .tabItem {
+                    Label {
+                        Text("Complete Price Tag Log")
+                    } icon: {
+                        Image(systemName: "hand.thumbsup.circle.fill")
+                    }
+                }
+                
+                NavigationView {
                     PriceChangeLogView()
                         .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 }
