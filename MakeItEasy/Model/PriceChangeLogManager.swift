@@ -13,28 +13,22 @@ class PriceChangeLogManager: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     
     var document = Scanner()
-//    @Published var scannedProducts: [Product?] = []
         
     func parseProductObjectFile(forResource name: String, withExtension ext: String) async {
         guard let fileURL = Bundle(for: type(of: self)).url(forResource: name, withExtension: ext) else { return }
         guard let data = try? Data(contentsOf: fileURL) else { return }
         guard let products = try? JSONDecoder().decode([Product].self, from: data) else { return }
         
+        var itemIDs: [String] = []
+        
         for product in products {
             if let productInfo = try? JSONEncoder().encode(ProductInfo(brand: product.brand, sources: product.sources)) {
-                UserDefaults.standard.set(productInfo, forKey: product.itemID.uppercased())
+                let itemID = product.itemID.uppercased()
+                UserDefaults.standard.set(productInfo, forKey: itemID)
+                itemIDs.append(itemID)
             }
         }
-        UserDefaults.standard.set(true, forKey: "LoadingComplete")
-    }
-    
-    init() {
-        
-    }
-    
-    deinit {
-        for cancellable in cancellables {
-            cancellable.cancel()
-        }
+        UserDefaults.standard.set(itemIDs, forKey: "itemIDs")
+        UserDefaults.standard.set(true, forKey: "LoadingComplete")        
     }
 }

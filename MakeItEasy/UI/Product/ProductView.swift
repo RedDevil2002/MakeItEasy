@@ -19,23 +19,24 @@ struct ProductView: View {
     
     var body: some View {
         NavigationLink {
-            ProductDetailView()
-                .environmentObject(viewModel)
+            VStack(alignment: .center) {
+                ProductDetailView()
+                    .environmentObject(viewModel)
+            }
         } label: {
-            VStack {
+            VStack(alignment: .center) {
                 if let link = bestDescriptionLink {
                     AsyncImage(url: URL(string: link)) { image in
                         image
                             .resizable()
                             .scaledToFit()
-                            .padding()
                     } placeholder: {
                         ProgressView()
                             .scaledToFit()
                     }
                 }
             }
-            .frame(width: 350, height: 350)
+            .frame(width: 400, height: 400)
             .overlay(alignment: .bottom) {
                 Text(viewModel.itemID.uppercased()).bold()
             }

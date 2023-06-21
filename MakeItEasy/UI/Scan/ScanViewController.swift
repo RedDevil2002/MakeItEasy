@@ -24,10 +24,7 @@ struct ScanViewController: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {
     }
     
-    func makeCoordinator() -> Coordinator {
-        //Coordinator is Apple bridge between SwiftUI and ViewController
-        return Coordinator(document) // this basically call init of the UIViewControllerRepresentable above`
-    }
+    func makeCoordinator() -> Coordinator { Coordinator(document) }
     
     typealias UIViewControllerType = VNDocumentCameraViewController
     

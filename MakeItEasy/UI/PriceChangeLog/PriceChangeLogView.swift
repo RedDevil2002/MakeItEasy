@@ -24,7 +24,6 @@ struct PriceChangeLogView: View {
                     ForEach(viewModels.filter{ $0.brand == brand }, id: \.itemID) { viewModel in
                         ProductView()
                             .environmentObject(viewModel)
-                            .frame(width: 400, height: 400)
                             .tag(viewModel.itemID)
                     }
                 } header: {
