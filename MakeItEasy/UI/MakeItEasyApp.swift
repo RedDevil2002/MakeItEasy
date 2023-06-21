@@ -13,8 +13,28 @@ struct MakeItEasyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                PriceChangeLogView()
+            TabView {
+                NavigationView {
+                    PriceChangeLogView()
+                        .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                }
+                .tabItem {
+                    Label {
+                        Text("Price Change Log")
+                    } icon: {
+                        Image(systemName: "tag.circle.fill")
+                    }
+                }
+                
+                SettingView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                    .tabItem {
+                        Label {
+                            Text("Setting")
+                        } icon: {
+                            Image(systemName: "gear.circle.fill")
+                        }
+                    }
             }
         }
     }
