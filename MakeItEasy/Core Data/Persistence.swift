@@ -7,24 +7,25 @@
 
 import CoreData
 
-struct PersistenceController {
-    static let shared = PersistenceController()
+struct Persistence {
+    static let shared = Persistence()
 
-    static var preview: PersistenceController = {
-        let result = PersistenceController(inMemory: true)
+    static var preview: Persistence = {
+        let result = Persistence(inMemory: true)
         let viewContext = result.container.viewContext
-//        for _ in 0..<10 {
-//            let newItem = Item(context: viewContext)
-//            newItem.timestamp = Date()
-//        }
-//        do {
-//            try viewContext.save()
-//        } catch {
-//            // Replace this implementation with code to handle the error appropriately.
-//            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-//            let nsError = error as NSError
-//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-//        }
+        for i in 0..<10 {
+            let productImage = ProductImage(context: viewContext)
+            productImage.itemID = "\(i)"
+            productImage.source = "https://www.softmoc.com/items/images/585_XX3.jpg"
+        }
+        do {
+            try viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
         return result
     }()
 

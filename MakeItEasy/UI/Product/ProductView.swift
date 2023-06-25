@@ -8,33 +8,22 @@
 import SwiftUI
 
 struct ProductView: View {
+    // ViewContext passed down from the MakeItEasyApp file as an Environment Variable
+    @Environment(\.managedObjectContext) var viewContext
+    
     @ObservedObject var product: Product
-    var bestDescriptionLink: String? {
-        if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
-            return sources.map{ $0.uppercased() }.filter{ $0.contains(product.itemID.unwrapped.uppercased) }.first
-        }
-        return nil
-    }
+    @FetchRequest(entity: ProductImage.entity(), sortDescriptors: [])
+    private var images: FetchedResults<ProductImage>
+    
     var body: some View {
         VStack {
             NavigationLink {
                 ProductDetailView(product: product)
+                    .environment(\.managedObjectContext, viewContext)
             } label: {
-                if let link = bestDescriptionLink {
-                    AsyncImage(url: URL(string: link)) { image in
-                        image
-                            .resizable()
-                            .cornerRadius(15.0)
-                            .scaledToFit()
-                            .padding()
-                    } placeholder: {
-                        ProgressView()
-                            .scaledToFit()
-                    }
-                }
+                RoundedRectangle(cornerRadius: 15)
             }
-            .padding()
-
+            Text("\(product.images?.count ?? 0)")
             HStack {
                 Spacer()
                 Text(product.itemID.unwrapped.uppercased())
@@ -42,18 +31,28 @@ struct ProductView: View {
                     .foregroundColor(.primary)
                 Spacer()
             }
+//            .onAppear {
+//                images.nsPredicate = NSPredicate(format: "itemID = %@", product.itemID.unwrapped)
+//            }
         }
         .frame(height: 400)
+        .onLongPressGesture {
+            product.completed.toggle()
+            try? viewContext.save()
+        }
     }
 }
 
 struct ProductView_Previews: PreviewProvider {
     
     static var previews: some View {
-        let product = Product(context: PersistenceController.preview.container.viewContext)
+        let product = Product(context: Persistence.preview.container.viewContext)
         product.itemID = "585"
         product.brand = "blundstone"
-        product.sources = nil
+        let productImage = ProductImage(context: Persistence.preview.container.viewContext)
+        productImage.source = "https://www.softmoc.com/items/images/585_XX3.jpg"
+        productImage.itemID = "585"
         return ProductView(product: product)
     }
+    
 }

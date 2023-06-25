@@ -6,50 +6,46 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ProductDetailView: View {
     @Environment(\.managedObjectContext) var viewContext
     @ObservedObject var product: Product
-    @State private var itemID: String
+    @State private var itemID: String = ""
+    
+    @FetchRequest(entity: ProductImage.entity(), sortDescriptors: [])
+    private var images: FetchedResults<ProductImage>
     
     init(product: Product) {
         self.product = product
-        self.itemID = product.itemID.unwrapped
-    }
-    
-    var sources: [String] {
-        if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
-            return sources.map{ $0.uppercased() }.filter{ $0.contains(product.itemID.unwrapped.uppercased) }
-        }
-        return []
+        self.itemID = (product.itemID).unwrapped.uppercased()
     }
     
     var body: some View {
-        VStack(alignment: .center) {
-            HStack {
-                Spacer()
-                TextField("", text: $itemID)
-                    .onChange(of: itemID) { newValue in
-                        self.product.itemID = newValue
-                        try? viewContext.save()
+        List {
+            ForEach(images, id: \.self) { image in
+                VStack {
+                    AsyncImage(url: URL(string: image.source.unwrapped)) { image in
+                        image
+                            .resizable()
+                            .cornerRadius(15.0)
+                            .scaledToFit()
+                            .frame(width: 350, height: 350)
+                    } placeholder: {
+                        ProgressView()
                     }
-                Spacer()
-            }
-            TabView {
-                ForEach(sources, id: \.self) { link in
-                    VStack {
-                        AsyncImage(url: URL(string: link)) { image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 350, height: 350)
-                        } placeholder: {
-                            ProgressView()
-                        }
-                        Text(link)
+                }
+                .contextMenu {
+                    Button {
+                        
+                    } label: {
+                        Text(image.source?.lowercased() ?? "")
                     }
                 }
             }
+        }
+        .task {
+            self.images.nsPredicate = NSPredicate(format: "itemID = %@", itemID)
         }
         .tabViewStyle(.page)
         
@@ -58,10 +54,12 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let product = Product(context: PersistenceController.preview.container.viewContext)
+        let product = Product(context: Persistence.preview.container.viewContext)
         product.itemID = "585"
         product.brand = "blundstone"
-        product.sources = nil
+        let productImage = ProductImage(context: Persistence.preview.container.viewContext)
+        productImage.source = "https://www.softmoc.com/items/images/585_XX3.jpg"
+        productImage.itemID = "585"
         return ProductDetailView(product: product)
     }
 }

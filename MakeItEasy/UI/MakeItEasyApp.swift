@@ -9,11 +9,21 @@ import SwiftUI
 
 @main
 struct MakeItEasyApp: App {
-    let persistenceController = PersistenceController.shared
+    let persistenceController = Persistence.shared
     
     var body: some Scene {
         WindowGroup {
             TabView {
+                ImagesView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .tabItem {
+                    Label {
+                        Text("Images")
+                    } icon: {
+                        Image(systemName: "photo.stack")
+                    }
+                }
+                
                 NavigationView {
                     PriceChangeLogView()
                         .environment(\.managedObjectContext, persistenceController.container.viewContext)

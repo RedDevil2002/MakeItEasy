@@ -8,15 +8,17 @@
 import Foundation
 class Levenshtein: ObservableObject {
     @Published private(set) var items: [String] = []
+    @Published private(set) var isDoneLoadingAllItems: Bool = false
     
     func getAllItems() async {
-        do {
+        await Persistence.shared.container.performBackgroundTask { context in
             let fetchRequest = Product.fetchRequest()
-            let context = PersistenceController.shared.container.viewContext
-            let products = try context.fetch(fetchRequest)
-            items = products.compactMap{ $0.itemID?.uppercased() }
-        } catch {
-            return 
+            let context = Persistence.shared.container.viewContext
+            guard let products = try? context.fetch(fetchRequest) else { return }
+            DispatchQueue.main.async {
+                self.items = products.compactMap{ $0.itemID?.uppercased() }
+                self.isDoneLoadingAllItems = true
+            }
         }
     }
     
@@ -64,6 +66,9 @@ class Levenshtein: ObservableObject {
     }
 
     func closestString(to x: String, in array: [String]) -> String? {
+        while !isDoneLoadingAllItems {
+            sleep(1)
+        }
         var closestString: String?
         var minDistance = Int.max
         
@@ -75,7 +80,6 @@ class Levenshtein: ObservableObject {
                 closestString = string
             }
         }
-        
         return closestString
     }
 }

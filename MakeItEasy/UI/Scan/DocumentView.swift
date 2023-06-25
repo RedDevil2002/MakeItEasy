@@ -36,7 +36,7 @@ struct DocumentView: View {
         Button {
             showDocumentScannerView.toggle()
         } label: {
-            UI.Constant.ScanButton()
+            Constant.UI.ScanButton(.primary)
             
         }
     }

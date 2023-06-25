@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @StateObject var priceChangeLogManager = ProductInfoParser()
+    @StateObject var priceChangeLogManager = ProductParser()
     
     var body: some View {
         PriceChangeLogView()
@@ -25,6 +25,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        ContentView().environment(\.managedObjectContext, Persistence.preview.container.viewContext)
     }
 }
