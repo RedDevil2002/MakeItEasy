@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ProductDetailView: View {
     @Environment(\.managedObjectContext) var viewContext
@@ -17,43 +18,34 @@ struct ProductDetailView: View {
     
     init(product: Product) {
         self.product = product
-        self.itemID = (product.itemID).unwrapped
+        self.itemID = (product.itemID).unwrapped.uppercased()
     }
     
     var body: some View {
-        VStack(alignment: .center) {
-            HStack {
-                Spacer()
-                TextField("", text: $itemID)
-                    .onChange(of: itemID) { newValue in
-                        self.product.itemID = newValue
-                        try? viewContext.save()
+        List {
+            ForEach(images, id: \.self) { image in
+                VStack {
+                    AsyncImage(url: URL(string: image.source.unwrapped)) { image in
+                        image
+                            .resizable()
+                            .cornerRadius(15.0)
+                            .scaledToFit()
+                            .frame(width: 350, height: 350)
+                    } placeholder: {
+                        ProgressView()
                     }
-                    .multilineTextAlignment(.center)
-                Spacer()
-            }
-            TabView {
-                ForEach(images, id: \.self) { image in
-                    VStack {
-                        AsyncImage(url: URL(string: image.source.unwrapped)) { image in
-                            image
-                                .resizable()
-                                .cornerRadius(15.0)
-                                .scaledToFit()
-                                .frame(width: 350, height: 350)
-                        } placeholder: {
-                            ProgressView()
-                        }
-                    }
-                    .contextMenu {
-                        Button {
-                            
-                        } label: {
-                            Text(image.source?.lowercased() ?? "")
-                        }
+                }
+                .contextMenu {
+                    Button {
+                        
+                    } label: {
+                        Text(image.source?.lowercased() ?? "")
                     }
                 }
             }
+        }
+        .task {
+            self.images.nsPredicate = NSPredicate(format: "itemID = %@", itemID)
         }
         .tabViewStyle(.page)
         

@@ -20,6 +20,6 @@ struct Constant {
             }
         }
     }
-    
     static let totalNumberOfProducts = 3933
+    static let totalNumberOfImages = 22542
 }

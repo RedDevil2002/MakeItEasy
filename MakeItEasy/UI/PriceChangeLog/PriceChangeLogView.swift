@@ -15,8 +15,8 @@ struct PriceChangeLogView: View {
         sectionIdentifier: \.brand,
         sortDescriptors: [SortDescriptor(\.brand)],
         predicate: NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "itemID = %@", "*&^(*@^(@(*#&!)(*&"),
-            NSPredicate(format: "completed == NO")
+//            NSPredicate(format: "itemID = %@", "*&^(*@^(@(*#&!)(*&"),
+//            NSPredicate(format: "completed == NO")
         ])
     )
     private var products: SectionedFetchResults<Optional<String>, Product>

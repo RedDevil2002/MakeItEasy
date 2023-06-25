@@ -24,7 +24,7 @@ struct CompletedPriceLogView: View {
                 ForEach(products) { section in
                     Section(header: Text(section.id.unwrapped).bold().font(.title2)) {
                         ForEach(section) { product in
-                            ProductView(product: product)
+                            ProductDetailView(product: product)
                                 .environment(\.managedObjectContext, viewContext)
                         }
                     }

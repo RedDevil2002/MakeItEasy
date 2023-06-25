@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @StateObject var priceChangeLogManager = ProductInfoParser()
+    @StateObject var priceChangeLogManager = ProductParser()
     
     var body: some View {
         PriceChangeLogView()

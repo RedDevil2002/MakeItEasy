@@ -14,15 +14,13 @@ struct MakeItEasyApp: App {
     var body: some Scene {
         WindowGroup {
             TabView {
-                NavigationView {
-                    CompletedPriceLogView()
-                        .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                }
+                ImagesView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .tabItem {
                     Label {
-                        Text("Complete Price Tag Log")
+                        Text("Images")
                     } icon: {
-                        Image(systemName: "hand.thumbsup.circle.fill")
+                        Image(systemName: "photo.stack")
                     }
                 }
                 

@@ -17,27 +17,13 @@ struct ProductView: View {
     
     var body: some View {
         VStack {
-            
             NavigationLink {
                 ProductDetailView(product: product)
+                    .environment(\.managedObjectContext, viewContext)
             } label: {
                 RoundedRectangle(cornerRadius: 15)
             }
-//
-//                if let link = bestDescriptionLink {
-//                    AsyncImage(url: URL(string: link)) { image in
-//                        image
-//                            .resizable()
-//                            .cornerRadius(15.0)
-//                            .scaledToFit()
-//                            .padding()
-//                    } placeholder: {
-//                        ProgressView()
-//                            .scaledToFit()
-//                            .padding()
-//                    }
-//                }
-//            }
+            Text("\(product.images?.count ?? 0)")
             HStack {
                 Spacer()
                 Text(product.itemID.unwrapped.uppercased())
@@ -54,7 +40,6 @@ struct ProductView: View {
             product.completed.toggle()
             try? viewContext.save()
         }
-        
     }
 }
 
@@ -69,4 +54,5 @@ struct ProductView_Previews: PreviewProvider {
         productImage.itemID = "585"
         return ProductView(product: product)
     }
+    
 }

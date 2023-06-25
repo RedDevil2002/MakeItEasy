@@ -12,7 +12,7 @@ struct SettingView: View {
     // ViewContext passed down from the MakeItEasyApp file as an Environment Variable
     @Environment(\.managedObjectContext) var viewContext
     // PriceChangeLogManager can parse the json file with product infos
-    @StateObject private var priceChangeLogManager = ProductInfoParser()
+    @StateObject private var priceChangeLogManager = ProductParser()
     @State private var showLoadingProductInfos = false
     @State private var showLoadingProductImageInfo = false
     @State private var currentItem = 0
@@ -45,30 +45,11 @@ struct SettingView: View {
                     Image(systemName: "tray.and.arrow.down.fill")
                 }
             }
-            
-            Button {
-                showLoadingProductImageInfo.toggle()
-                Task {
-                    await loadImages()
-                }
-            } label: {
-                Label {
-                    Text("Images")
-                } icon: {
-                    Image(systemName: "photo.circle.fill")
-                }
-            }
         }
         .sheet(isPresented: $showLoadingProductInfos) {
-            CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts))
+            CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts + Constant.totalNumberOfImages))
                 .onReceive(priceChangeLogManager.downloadStatusPublisher) { itemCurrentlyDownloading in
                     currentItem = itemCurrentlyDownloading
-                }
-        }
-        .sheet(isPresented: $showLoadingProductImageInfo) {
-            CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts * 10))
-                .onReceive(priceChangeLogManager.downloadStatusPublisherForImages) { imageCurrentlyDownloading in
-                    currentImage = imageCurrentlyDownloading
                 }
         }
     }
@@ -76,11 +57,6 @@ struct SettingView: View {
     private func load() async {
         await deleteAll(of: "Product")
         await priceChangeLogManager.parseProductObjectFile(forResource: "productInfos", withExtension: "json")
-    }
-    
-    private func loadImages() async {
-        await deleteAll(of: "ProductImage")
-        await priceChangeLogManager.parseProductObjectFileForImages(forResource: "productInfos", withExtension: "json")
     }
     
     private func deleteAll(of entityName: String) async {
