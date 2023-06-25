@@ -84,7 +84,7 @@ struct PriceChangeLogView: View {
         Button {
             showDocumentScannerView.toggle()
         } label: {
-            UI.Constant.ScanButton(levenshtein.isDoneLoadingAllItems ? .primary: .red)
+            Constant.UI.ScanButton(levenshtein.isDoneLoadingAllItems ? .primary: .red)
         }
         .disabled(!levenshtein.isDoneLoadingAllItems)
     }

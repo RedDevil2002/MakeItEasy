@@ -47,7 +47,7 @@ struct SettingView: View {
             }
         }
         .sheet(isPresented: $showLoadingProductInfos) {
-            CircularProgress(progress: Double(currentItem) / Double(priceChangeLogManager.total))
+            CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts))
                 .onReceive(priceChangeLogManager.$currentItem.eraseToAnyPublisher()) { itemCurrentlyDownloading in
                     currentItem = itemCurrentlyDownloading
                 }

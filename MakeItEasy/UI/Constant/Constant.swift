@@ -1,14 +1,14 @@
 //
-//  UIConsant.swift
+//  Constant.swift
 //  MakeItEasy
 //
-//  Created by Brian Seo on 2023-06-13.
+//  Created by Brian Seo on 2023-06-25.
 //
 
 import SwiftUI
 
-struct UI {
-    struct Constant {
+struct Constant {
+    struct UI {
         static func ScanButton(_ color: Color) -> some View {
             ZStack {
                 Circle()
@@ -20,4 +20,6 @@ struct UI {
             }
         }
     }
+    
+    static let totalNumberOfProducts = 3933
 }

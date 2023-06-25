@@ -10,7 +10,7 @@ import CoreData
 
 class ProductInfoParser: ObservableObject {
     private let logger: Logger = Logger(subsystem: "com.devil.red.MakeItEasy", category: "PriceChangeLogManager")
-    let total = 3933
+    
     
     @Published var currentItem = 0
     
