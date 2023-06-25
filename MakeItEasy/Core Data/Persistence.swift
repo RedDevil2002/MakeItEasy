@@ -7,11 +7,11 @@
 
 import CoreData
 
-struct PersistenceController {
-    static let shared = PersistenceController()
+struct Persistence {
+    static let shared = Persistence()
 
-    static var preview: PersistenceController = {
-        let result = PersistenceController(inMemory: true)
+    static var preview: Persistence = {
+        let result = Persistence(inMemory: true)
         let viewContext = result.container.viewContext
 //        for _ in 0..<10 {
 //            let newItem = Item(context: viewContext)

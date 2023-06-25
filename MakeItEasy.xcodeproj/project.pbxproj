@@ -28,7 +28,6 @@
 		8682CB382A38427600E6AB4A /* products.json in Resources */ = {isa = PBXBuildFile; fileRef = 8682CB362A38427600E6AB4A /* products.json */; };
 		8682CB3A2A3842EE00E6AB4A /* JSONParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682CB392A3842EE00E6AB4A /* JSONParsingTests.swift */; };
 		8682CB402A38447800E6AB4A /* ProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682CB3F2A38447800E6AB4A /* ProductInfo.swift */; };
-		8682CB412A38447800E6AB4A /* ProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682CB3F2A38447800E6AB4A /* ProductInfo.swift */; };
 		8682CB462A384B5100E6AB4A /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682CB452A384B5100E6AB4A /* ProductView.swift */; };
 		8682CB472A384B5100E6AB4A /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682CB452A384B5100E6AB4A /* ProductView.swift */; };
 		8682CB492A38E6C500E6AB4A /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682CB482A38E6C500E6AB4A /* ProductDetailView.swift */; };
@@ -124,12 +123,29 @@
 			path = PriceChangeLog;
 			sourceTree = "<group>";
 		};
-		8674E60A2A38F55B000F46DA /* Constant */ = {
+		8626A8322A483BAD00F0035B /* Scan */ = {
 			isa = PBXGroup;
 			children = (
-				8626A8302A483A9400F0035B /* Constant.swift */,
+				864703382A425FDD006C16D9 /* Levenshtein.swift */,
+				860EB9162A39058A00FB336B /* ProductInfoParser.swift */,
 			);
-			path = Constant;
+			path = Scan;
+			sourceTree = "<group>";
+		};
+		8626A8332A483D2800F0035B /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				868266B82A40F98D0094126B /* ProductViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		8626A8342A483D5300F0035B /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				8626A8322A483BAD00F0035B /* Scan */,
+			);
+			path = Service;
 			sourceTree = "<group>";
 		};
 		8682CAFA2A38419A00E6AB4A = {
@@ -155,7 +171,9 @@
 		8682CB052A38419A00E6AB4A /* MakeItEasy */ = {
 			isa = PBXGroup;
 			children = (
-				868266B82A40F98D0094126B /* ProductViewModel.swift */,
+				8626A8342A483D5300F0035B /* Service */,
+				8626A8332A483D2800F0035B /* ViewModel */,
+				8682CB3E2A38435B00E6AB4A /* Core Data */,
 				8682CB3D2A38434000E6AB4A /* Resource */,
 				8682CB3B2A38431E00E6AB4A /* UI */,
 				8682CB3C2A38433400E6AB4A /* Model */,
@@ -197,7 +215,6 @@
 				8682CB082A38419A00E6AB4A /* ContentView.swift */,
 				864703362A4241F5006C16D9 /* SettingView.swift */,
 				860EB9182A39073600FB336B /* PriceChangeLog */,
-				8674E60A2A38F55B000F46DA /* Constant */,
 				8682CB4C2A38EE3400E6AB4A /* Scan */,
 				8682CB4B2A38EDFE00E6AB4A /* Product */,
 			);
@@ -207,10 +224,8 @@
 		8682CB3C2A38433400E6AB4A /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				8682CB3E2A38435B00E6AB4A /* Core Data */,
+				8626A8302A483A9400F0035B /* Constant.swift */,
 				8682CB3F2A38447800E6AB4A /* ProductInfo.swift */,
-				864703382A425FDD006C16D9 /* Levenshtein.swift */,
-				860EB9162A39058A00FB336B /* ProductInfoParser.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -414,7 +429,6 @@
 				8682CB472A384B5100E6AB4A /* ProductView.swift in Sources */,
 				8682CB4F2A38EE4D00E6AB4A /* ScanViewController.swift in Sources */,
 				8682CB3A2A3842EE00E6AB4A /* JSONParsingTests.swift in Sources */,
-				8682CB412A38447800E6AB4A /* ProductInfo.swift in Sources */,
 				8682CB522A38EEF000E6AB4A /* Scanner.swift in Sources */,
 				8682CB1E2A38419B00E6AB4A /* MakeItEasyTests.swift in Sources */,
 				8682CB552A38EF0B00E6AB4A /* DocumentView.swift in Sources */,

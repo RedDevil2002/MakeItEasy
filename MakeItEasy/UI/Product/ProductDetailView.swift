@@ -10,18 +10,14 @@ import SwiftUI
 struct ProductDetailView: View {
     @Environment(\.managedObjectContext) var viewContext
     @ObservedObject var product: Product
-    @State private var itemID: String
+    @State private var itemID: String = ""
+    
+    @FetchRequest(entity: ProductImage.entity(), sortDescriptors: [])
+    private var images: FetchedResults<ProductImage>
     
     init(product: Product) {
         self.product = product
-        self.itemID = product.itemID.unwrapped
-    }
-    
-    var sources: [String] {
-        if let data = product.sources, let sources = try? JSONDecoder().decode([String].self, from: data) {
-            return sources.map{ $0.uppercased() }.filter{ $0.contains(product.itemID.unwrapped.uppercased) }
-        }
-        return []
+        self.itemID = (product.itemID).unwrapped
     }
     
     var body: some View {
@@ -37,9 +33,9 @@ struct ProductDetailView: View {
                 Spacer()
             }
             TabView {
-                ForEach(sources, id: \.self) { link in
+                ForEach(images, id: \.self) { image in
                     VStack {
-                        AsyncImage(url: URL(string: link)) { image in
+                        AsyncImage(url: URL(string: image.source.unwrapped)) { image in
                             image
                                 .resizable()
                                 .cornerRadius(15.0)
@@ -53,7 +49,7 @@ struct ProductDetailView: View {
                         Button {
                             
                         } label: {
-                            Text(link.lowercased())
+                            Text(image.source?.lowercased() ?? "")
                         }
                     }
                 }
@@ -66,10 +62,12 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let product = Product(context: PersistenceController.preview.container.viewContext)
+        let product = Product(context: Persistence.preview.container.viewContext)
         product.itemID = "585"
         product.brand = "blundstone"
-        product.sources = nil
+        let productImage = ProductImage(context: Persistence.preview.container.viewContext)
+        productImage.source = "https://www.softmoc.com/items/images/585_XX3.jpg"
+        productImage.itemID = "585"
         return ProductDetailView(product: product)
     }
 }

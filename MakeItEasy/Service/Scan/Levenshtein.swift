@@ -11,9 +11,9 @@ class Levenshtein: ObservableObject {
     @Published private(set) var isDoneLoadingAllItems: Bool = false
     
     func getAllItems() async {
-        await PersistenceController.shared.container.performBackgroundTask { context in
+        await Persistence.shared.container.performBackgroundTask { context in
             let fetchRequest = Product.fetchRequest()
-            let context = PersistenceController.shared.container.viewContext
+            let context = Persistence.shared.container.viewContext
             guard let products = try? context.fetch(fetchRequest) else { return }
             DispatchQueue.main.async {
                 self.items = products.compactMap{ $0.itemID?.uppercased() }

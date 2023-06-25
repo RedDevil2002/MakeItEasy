@@ -13,16 +13,16 @@ struct SettingView: View {
     @Environment(\.managedObjectContext) var viewContext
     // PriceChangeLogManager can parse the json file with product infos
     @StateObject private var priceChangeLogManager = ProductInfoParser()
-    
     @State private var showLoadingProductInfos = false
-    
+    @State private var showLoadingProductImageInfo = false
     @State private var currentItem = 0
-    
+    @State private var currentImage = 0
     var body: some View {
         List {
             Button {
                 Task {
-                    await self.deleteAll()
+                    await deleteAll(of: "Product")
+                    await deleteAll(of: "ProductImage")
                 }
             } label: {
                 Label {
@@ -45,22 +45,46 @@ struct SettingView: View {
                     Image(systemName: "tray.and.arrow.down.fill")
                 }
             }
+            
+            Button {
+                showLoadingProductImageInfo.toggle()
+                Task {
+                    await loadImages()
+                }
+            } label: {
+                Label {
+                    Text("Images")
+                } icon: {
+                    Image(systemName: "photo.circle.fill")
+                }
+            }
         }
         .sheet(isPresented: $showLoadingProductInfos) {
             CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts))
-                .onReceive(priceChangeLogManager.$currentItem.eraseToAnyPublisher()) { itemCurrentlyDownloading in
+                .onReceive(priceChangeLogManager.downloadStatusPublisher) { itemCurrentlyDownloading in
                     currentItem = itemCurrentlyDownloading
+                }
+        }
+        .sheet(isPresented: $showLoadingProductImageInfo) {
+            CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts * 10))
+                .onReceive(priceChangeLogManager.downloadStatusPublisherForImages) { imageCurrentlyDownloading in
+                    currentImage = imageCurrentlyDownloading
                 }
         }
     }
     
     private func load() async {
-        await deleteAll()
+        await deleteAll(of: "Product")
         await priceChangeLogManager.parseProductObjectFile(forResource: "productInfos", withExtension: "json")
     }
     
-    private func deleteAll() async {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Product")
+    private func loadImages() async {
+        await deleteAll(of: "ProductImage")
+        await priceChangeLogManager.parseProductObjectFileForImages(forResource: "productInfos", withExtension: "json")
+    }
+    
+    private func deleteAll(of entityName: String) async {
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: entityName)
         // Create a batch delete request for the
         // fetch request
         let deleteRequest = NSBatchDeleteRequest(

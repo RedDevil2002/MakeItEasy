@@ -14,8 +14,7 @@ struct CompletedPriceLogView: View {
     
     @SectionedFetchRequest<Optional<String>, Product>(
         sectionIdentifier: \.brand,
-        sortDescriptors: [SortDescriptor(\.brand)],
-        predicate: NSPredicate(format: "completed == YES")
+        sortDescriptors: [SortDescriptor(\.brand)]
     )
     private var products: SectionedFetchResults<Optional<String>, Product>
     
