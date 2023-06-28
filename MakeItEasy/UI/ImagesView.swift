@@ -10,25 +10,23 @@ import CoreData
 
 struct ImagesView: View {
     @Environment(\.managedObjectContext) var viewContext
-    @FetchRequest(entity: ProductImage.entity(), sortDescriptors: [])
-    private var images: FetchedResults<ProductImage>
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(images) { productImage in
-                        AsyncImage(url: URL(string: productImage.source.unwrapped)) { image in
-                            image
-                                .resizable()
-                                .cornerRadius(15.0)
-                                .scaledToFit()
-                                .frame(width: 350, height: 350)
-                        } placeholder: {
-                            ProgressView()
-                        }
-                }
-            }
-            .navigationTitle("\(images.count)")
+//            List {
+//                ForEach(images) { productImage in
+//                        AsyncImage(url: URL(string: productImage.source.unwrapped)) { image in
+//                            image
+//                                .resizable()
+//                                .cornerRadius(15.0)
+//                                .scaledToFit()
+//                                .frame(width: 350, height: 350)
+//                        } placeholder: {
+//                            ProgressView()
+//                        }
+//                }
+//            }
+//            .navigationTitle("\(images.count)")
         }
     }
 }

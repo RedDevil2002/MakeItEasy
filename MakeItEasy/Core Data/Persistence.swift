@@ -13,11 +13,6 @@ struct Persistence {
     static var preview: Persistence = {
         let result = Persistence(inMemory: true)
         let viewContext = result.container.viewContext
-        for i in 0..<10 {
-            let productImage = ProductImage(context: viewContext)
-            productImage.itemID = "\(i)"
-            productImage.source = "https://www.softmoc.com/items/images/585_XX3.jpg"
-        }
         do {
             try viewContext.save()
         } catch {

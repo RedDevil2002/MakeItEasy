@@ -4,12 +4,12 @@
         <attribute name="brand" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="completed" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="itemID" optional="YES" attributeType="String" defaultValueString="" spotlightIndexingEnabled="YES"/>
-        <relationship name="images" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProductImage" inverseName="product" inverseEntity="ProductImage"/>
-    </entity>
-    <entity name="ProductImage" representedClassName="ProductImage" syncable="YES" codeGenerationType="class">
-        <attribute name="data" optional="YES" attributeType="Binary"/>
-        <attribute name="itemID" optional="YES" attributeType="String" defaultValueString="" spotlightIndexingEnabled="YES"/>
-        <attribute name="source" optional="YES" attributeType="String" defaultValueString=""/>
-        <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="images" inverseEntity="Product"/>
+        <attribute name="sources" optional="YES" attributeType="Binary"/>
+        <attribute name="xx2" optional="YES" attributeType="Binary"/>
+        <attribute name="xx3" optional="YES" attributeType="Binary"/>
+        <attribute name="xx4" optional="YES" attributeType="Binary"/>
+        <attribute name="xx5" optional="YES" attributeType="Binary"/>
+        <attribute name="xx6" optional="YES" attributeType="Binary"/>
+        <attribute name="xxx" optional="YES" attributeType="Binary"/>
     </entity>
 </model>

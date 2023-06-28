@@ -8,47 +8,62 @@
 import SwiftUI
 import CoreData
 
-struct ProductDetailView: View {
-    @Environment(\.managedObjectContext) var viewContext
-    @ObservedObject var product: Product
-    @State private var itemID: String = ""
+class ProductDetailViewModel: ObservableObject {
+    @Published var product: Product
+    @Published var itemID: String
     
-    @FetchRequest(entity: ProductImage.entity(), sortDescriptors: [])
-    private var images: FetchedResults<ProductImage>
+    let encoder: JSONEncoder = JSONEncoder()
+    let decoder: JSONDecoder = JSONDecoder()
+    
+    var sources: [String] {
+        if let data = product.sources, let result = try? decoder.decode([String].self, from: data) {
+            return result.sorted { lhs, rhs in
+                if lhs.hasSuffix("XXX.jpg") {
+                    return true
+                } else if rhs.hasSuffix("XXX.jpg") {
+                    return false
+                }
+                return lhs < rhs
+            }
+        }
+        return []
+    }
+    
+    var imageDatas: [Data] {
+        [product.xxx, product.xx2, product.xx3, product.xx4, product.xx5, product.xx6].compactMap{ $0 }
+    }
     
     init(product: Product) {
         self.product = product
-        self.itemID = (product.itemID).unwrapped.uppercased()
+        self.itemID = product.itemID.unwrapped
     }
-    
+}
+
+struct ProductDetailView: View {
+    @Environment(\.managedObjectContext) var viewContext
+    @StateObject var viewModel: ProductDetailViewModel
+        
     var body: some View {
-        List {
-            ForEach(images, id: \.self) { image in
-                VStack {
-                    AsyncImage(url: URL(string: image.source.unwrapped)) { image in
+        VStack {
+            TabView {
+                ForEach(viewModel.sources, id: \.self) { source in
+                    AsyncImage(url: URL(string: source)) { image in
                         image
                             .resizable()
-                            .cornerRadius(15.0)
-                            .scaledToFit()
-                            .frame(width: 350, height: 350)
+                            .cornerRadius(25.0)
+                            .padding()
+                            .frame(height: 350)
                     } placeholder: {
                         ProgressView()
                     }
                 }
-                .contextMenu {
-                    Button {
-                        
-                    } label: {
-                        Text(image.source?.lowercased() ?? "")
-                    }
-                }
             }
-        }
-        .task {
-            self.images.nsPredicate = NSPredicate(format: "itemID = %@", itemID)
+            Text(viewModel.itemID)
+                .bold()
+                .font(.largeTitle)
+                .padding()
         }
         .tabViewStyle(.page)
-        
     }
 }
 
@@ -57,9 +72,7 @@ struct ProductDetailView_Previews: PreviewProvider {
         let product = Product(context: Persistence.preview.container.viewContext)
         product.itemID = "585"
         product.brand = "blundstone"
-        let productImage = ProductImage(context: Persistence.preview.container.viewContext)
-        productImage.source = "https://www.softmoc.com/items/images/585_XX3.jpg"
-        productImage.itemID = "585"
-        return ProductDetailView(product: product)
+        let productDetailViewModel = ProductDetailViewModel(product: product)
+        return ProductDetailView(viewModel: productDetailViewModel)
     }
 }

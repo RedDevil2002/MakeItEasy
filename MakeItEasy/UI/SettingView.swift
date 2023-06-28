@@ -13,25 +13,25 @@ struct SettingView: View {
     @Environment(\.managedObjectContext) var viewContext
     // PriceChangeLogManager can parse the json file with product infos
     @StateObject private var priceChangeLogManager = ProductParser()
+    @StateObject private var imageAssetsDownloader = ImageAssetsDownloader()
     @State private var showLoadingProductInfos = false
-    @State private var showLoadingProductImageInfo = false
+    @State private var showLoadingProductImages = false
     @State private var currentItem = 0
     @State private var currentImage = 0
     var body: some View {
         List {
-            Button {
-                Task {
-                    await deleteAll(of: "Product")
-                    await deleteAll(of: "ProductImage")
-                }
-            } label: {
-                Label {
-                    Text("Delete All")
-                } icon: {
-                    Image(systemName: "trash.circle.fill")
-                }
-                .foregroundColor(.red)
-            }
+//            Button {
+//                Task {
+//                    await deleteAll(of: "Product")
+//                }
+//            } label: {
+//                Label {
+//                    Text("Delete All")
+//                } icon: {
+//                    Image(systemName: "trash.circle.fill")
+//                }
+//                .foregroundColor(.red)
+//            }
             
             Button {
                 showLoadingProductInfos.toggle()
@@ -47,11 +47,16 @@ struct SettingView: View {
             }
         }
         .sheet(isPresented: $showLoadingProductInfos) {
-            CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts + Constant.totalNumberOfImages))
+            CircularProgress(progress: Double(currentItem) / Double(Constant.totalNumberOfProducts))
                 .onReceive(priceChangeLogManager.downloadStatusPublisher) { itemCurrentlyDownloading in
                     currentItem = itemCurrentlyDownloading
+                    print(itemCurrentlyDownloading)
                 }
         }
+    }
+    
+    private func loadImages() async {
+//        await imageAssetsDownloader.downloadImages()
     }
     
     private func load() async {
@@ -107,7 +112,7 @@ struct CircularProgress: View {
                 
                 Circle()
                     .trim(from: 0.0, to: CGFloat(min(self.progress, 1.0)))
-                    .stroke(Color.blue, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                    .stroke(Color.primary, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                     .rotationEffect(Angle(degrees: -90))
                     .animation(.linear(duration: 0.5), value: progress)
 //                    .animation(.linear(duration: 0.5))

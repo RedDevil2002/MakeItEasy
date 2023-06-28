@@ -14,15 +14,15 @@ struct MakeItEasyApp: App {
     var body: some Scene {
         WindowGroup {
             TabView {
-                ImagesView()
-                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .tabItem {
-                    Label {
-                        Text("Images")
-                    } icon: {
-                        Image(systemName: "photo.stack")
-                    }
-                }
+//                ImagesView()
+//                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+//                .tabItem {
+//                    Label {
+//                        Text("Images")
+//                    } icon: {
+//                        Image(systemName: "photo.stack")
+//                    }
+//                }
                 
                 NavigationView {
                     PriceChangeLogView()
@@ -46,6 +46,7 @@ struct MakeItEasyApp: App {
                         }
                     }
             }
+            .accentColor(Color.primary)
         }
     }
 }

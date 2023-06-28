@@ -12,18 +12,44 @@ struct ProductView: View {
     @Environment(\.managedObjectContext) var viewContext
     
     @ObservedObject var product: Product
-    @FetchRequest(entity: ProductImage.entity(), sortDescriptors: [])
-    private var images: FetchedResults<ProductImage>
+    
+    @State private var showProductDetailView = false
     
     var body: some View {
         VStack {
-            NavigationLink {
-                ProductDetailView(product: product)
-                    .environment(\.managedObjectContext, viewContext)
-            } label: {
-                RoundedRectangle(cornerRadius: 15)
+            if let xxx = product.xxx, let uiImage = UIImage(data: xxx) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .cornerRadius(25.0)
+                    .padding()
+                    .frame(height: 400)
+                    .onTapGesture(count: 2) {
+                        showProductDetailView.toggle()
+                    }
+                    .onTapGesture {
+                        withAnimation {
+                            product.completed.toggle()
+                        }
+                        try? viewContext.save()
+                    }
+                    .overlay(alignment: .center, content: {
+                        Image(systemName: "checkmark.diamond.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                            .foregroundColor(product.completed ? .green : .clear)
+                            .padding()
+                            .disabled(true)
+                            .allowsTightening(false)
+                    })
+                    .background {
+                        RoundedRectangle(cornerRadius: 25.0)
+                            .strokeBorder(product.completed ? .green: .red, lineWidth: 10.0)
+                    }
+            } else {
+                ProgressView()
+                    .scaledToFit()
             }
-            Text("\(product.images?.count ?? 0)")
             HStack {
                 Spacer()
                 Text(product.itemID.unwrapped.uppercased())
@@ -31,11 +57,20 @@ struct ProductView: View {
                     .foregroundColor(.primary)
                 Spacer()
             }
-//            .onAppear {
-//                images.nsPredicate = NSPredicate(format: "itemID = %@", product.itemID.unwrapped)
-//            }
         }
-        .frame(height: 400)
+        .sheet(isPresented: $showProductDetailView, content: {
+            let productDetailViewModel = ProductDetailViewModel(product: product)
+            ProductDetailView(viewModel: productDetailViewModel)
+                .environment(\.managedObjectContext, viewContext)
+        })
+//        VStack {
+//            NavigationLink {
+//                let productDetailViewModel = ProductDetailViewModel(product: product)
+//                ProductDetailView(viewModel: productDetailViewModel)
+//                    .environment(\.managedObjectContext, viewContext)
+//            } label: {
+//            }
+//        }
         .onLongPressGesture {
             product.completed.toggle()
             try? viewContext.save()
@@ -49,9 +84,6 @@ struct ProductView_Previews: PreviewProvider {
         let product = Product(context: Persistence.preview.container.viewContext)
         product.itemID = "585"
         product.brand = "blundstone"
-        let productImage = ProductImage(context: Persistence.preview.container.viewContext)
-        productImage.source = "https://www.softmoc.com/items/images/585_XX3.jpg"
-        productImage.itemID = "585"
         return ProductView(product: product)
     }
     

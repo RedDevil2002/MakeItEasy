@@ -13,6 +13,8 @@ class ProductParser: ObservableObject {
     private let logger: Logger = Logger(subsystem: "com.devil.red.MakeItEasy", category: "PriceChangeLogManager")
     @Published var currentItem = 0
     
+    let encoder = JSONEncoder()
+    
     var downloadStatusPublisher: AnyPublisher<Int, Never> {
         $currentItem
             .receive(on: RunLoop.main)
@@ -30,8 +32,6 @@ class ProductParser: ObservableObject {
             self.currentItem = 0
         }
         
-        var productImageInfo: [(itemID: String, source: String)] = []
-        
         await Persistence.shared.container.performBackgroundTask { context in
             let insertRequest = NSBatchInsertRequest(entity: Product.entity()) { (object: NSManagedObject) in
                 guard let nextProduct = productIterator.next() else { return true }
@@ -40,8 +40,13 @@ class ProductParser: ObservableObject {
                     // save itemID in upper case
                     product.itemID = itemID
                     product.brand = nextProduct.brand
+                    let sources = nextProduct.sources.filter{ $0.uppercased().contains(itemID) }
+                    product.sources = try? self.encoder.encode(sources)
+                    if let xxx = sources.first, let imageURL = URL(string: xxx) {
+                        product.xxx = try? Data(contentsOf: imageURL)
+                    }                    
                 }
-                nextProduct.sources.filter{ $0.uppercased().contains(itemID) }.forEach{ productImageInfo.append((itemID: itemID, source: $0)) }
+                
                 DispatchQueue.main.async { [weak self] in
                     self?.currentItem += 1
                 }
@@ -54,26 +59,5 @@ class ProductParser: ObservableObject {
             NSManagedObjectContext.mergeChanges(fromRemoteContextSave: createdObjects, into: [context])
             UserDefaults.standard.set(true, forKey: "LoadingComplete")
         }
-        
-        var productImageIterator = productImageInfo.makeIterator()
-        await Persistence.shared.container.performBackgroundTask { context in
-            let insertRequest = NSBatchInsertRequest(entity: ProductImage.entity()) { (object: NSManagedObject) in
-                guard let nextProductImage = productImageIterator.next() else { return true }
-                if let productImage = object as? ProductImage {
-                    productImage.itemID = nextProductImage.itemID
-                    productImage.source = nextProductImage.source
-                }
-                DispatchQueue.main.async { [weak self] in
-                    self?.currentItem += 1
-                }
-                return false
-            }
-            insertRequest.resultType = .objectIDs
-            let batchInsert = try? context.execute(insertRequest) as? NSBatchInsertResult
-            guard let insertResult = batchInsert?.result as? [NSManagedObjectID] else { return }
-            let createdObjects: [AnyHashable: Any] = [NSInsertedObjectsKey: insertResult]
-            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: createdObjects, into: [context])
-        }
-
     }
 }

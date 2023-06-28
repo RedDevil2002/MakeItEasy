@@ -30,31 +30,43 @@ struct PriceChangeLogView: View {
     
     var body: some View {
         VStack {
-            if loading {
+            if loading && current < scanner.scannedItemIDs.count {
                 CircularProgress(progress: Double(current) / Double(scanner.scannedItemIDs.count))
-            }
-            ScrollView {
-                LazyVStack(pinnedViews: [.sectionHeaders]) {
-                    ForEach(products) { section in
-                        Section(header: Text(section.id.unwrapped).bold().font(.title2)) {
-                            ForEach(section) { product in
-                                ProductView(product: product)
-                                    .environment(\.managedObjectContext, viewContext)
+            } else {
+                ScrollView {
+                    LazyVStack(pinnedViews: [.sectionHeaders]) {
+                        ForEach(products) { section in
+                            Section(header: Text(section.id.unwrapped).bold().font(.largeTitle)) {
+                                ForEach(section) { product in
+                                    ProductView(product: product)
+                                        .environment(\.managedObjectContext, viewContext)
+                                }
                             }
+                            .headerProminence(.increased)
                         }
-                        .headerProminence(.increased)
                     }
                 }
-            }
-            ScanButton()
-                .sheet(isPresented: $showDocumentScannerView, onDismiss: {
-                    self.loading = true
-                }, content: {
-                    ScanViewController()
-                        .environmentObject(scanner)
-                })
-                .padding(.bottom)
+            }   
         }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                showDocumentScannerView.toggle()
+            } label: {
+                Image(systemName: "barcode.viewfinder")
+                    .renderingMode(.template)
+                    .font(.largeTitle)
+                    .padding()
+                    .foregroundColor(.primary)
+            }
+            .disabled(!levenshtein.isDoneLoadingAllItems)
+            
+        }
+        .sheet(isPresented: $showDocumentScannerView, onDismiss: {
+            self.loading = true
+        }, content: {
+            ScanViewController()
+                .environmentObject(scanner)
+        })
         .onChange(of: scanner.scannedItemIDs, perform: { newItems in
             DispatchQueue.global().async {
                 self.current = 0
@@ -66,8 +78,7 @@ struct PriceChangeLogView: View {
                 }
                 DispatchQueue.main.async {
                     self.products.nsPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                        NSPredicate(format: "itemID in %@", updatedItems),
-                        NSPredicate(format: "completed == NO")
+                        NSPredicate(format: "itemID in %@", updatedItems)
                     ])
                     self.loading = false
                 }
@@ -76,17 +87,6 @@ struct PriceChangeLogView: View {
         .task {
             await levenshtein.getAllItems()
         }
-        .navigationTitle(Text("Easy Price Change Log"))
-    }
-    
-    // ScanButton, when clicked on, shows the document scanner
-    private func ScanButton() -> some View {
-        Button {
-            showDocumentScannerView.toggle()
-        } label: {
-            Constant.UI.ScanButton(levenshtein.isDoneLoadingAllItems ? .primary: .red)
-        }
-        .disabled(!levenshtein.isDoneLoadingAllItems)
     }
 }
 

@@ -23,9 +23,9 @@ struct CompletedPriceLogView: View {
             LazyVStack(pinnedViews: [.sectionHeaders]) {
                 ForEach(products) { section in
                     Section(header: Text(section.id.unwrapped).bold().font(.title2)) {
-                        ForEach(section) { product in
-                            ProductDetailView(product: product)
-                                .environment(\.managedObjectContext, viewContext)
+                            ForEach(section) { product in
+                                ProductView(product: product)
+                                    .environment(\.managedObjectContext, viewContext)
                         }
                     }
                     .headerProminence(.increased)
