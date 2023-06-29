@@ -13,11 +13,7 @@ struct PriceChangeLogView: View {
     @Environment(\.managedObjectContext) var viewContext
     @SectionedFetchRequest<Optional<String>, Product>(
         sectionIdentifier: \.brand,
-        sortDescriptors: [SortDescriptor(\.brand)],
-        predicate: NSCompoundPredicate(andPredicateWithSubpredicates: [
-//            NSPredicate(format: "itemID = %@", "*&^(*@^(@(*#&!)(*&"),
-//            NSPredicate(format: "completed == NO")
-        ])
+        sortDescriptors: [SortDescriptor(\.brand)]
     )
     private var products: SectionedFetchResults<Optional<String>, Product>
     @StateObject var levenshtein = Levenshtein()
@@ -27,7 +23,7 @@ struct PriceChangeLogView: View {
     @State private var loading = false
     
     @State private var current = 0
-    
+        
     var body: some View {
         VStack {
             if loading && current < scanner.scannedItemIDs.count {
@@ -40,6 +36,7 @@ struct PriceChangeLogView: View {
                                 ForEach(section) { product in
                                     ProductView(product: product)
                                         .environment(\.managedObjectContext, viewContext)
+                                        .padding()
                                 }
                             }
                             .headerProminence(.increased)
@@ -49,17 +46,18 @@ struct PriceChangeLogView: View {
             }   
         }
         .overlay(alignment: .topTrailing) {
-            Button {
-                showDocumentScannerView.toggle()
-            } label: {
-                Image(systemName: "barcode.viewfinder")
-                    .renderingMode(.template)
-                    .font(.largeTitle)
-                    .padding()
-                    .foregroundColor(.primary)
+            if !loading || !(current < scanner.scannedItemIDs.count) {
+                Button {
+                    showDocumentScannerView.toggle()
+                } label: {
+                    Image(systemName: "barcode.viewfinder")
+                        .renderingMode(.template)
+                        .font(.largeTitle)
+                        .padding()
+                        .foregroundColor(.primary)
+                }
+                .disabled(!levenshtein.isDoneLoadingAllItems)
             }
-            .disabled(!levenshtein.isDoneLoadingAllItems)
-            
         }
         .sheet(isPresented: $showDocumentScannerView, onDismiss: {
             self.loading = true
@@ -89,7 +87,6 @@ struct PriceChangeLogView: View {
         }
     }
 }
-
 // return self ?? ""
 extension Optional<String> {
     var unwrapped: String {

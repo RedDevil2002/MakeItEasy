@@ -14,7 +14,6 @@ import OSLog
 class Scanner: ObservableObject {
     private let logger = Logger(subsystem: "com.devil.red.MakeItEasy", category: "Scanner")
     @Published var scannedItemIDs: [String] = []
-    var AllItemIDs: [String] = []
     
     var request: VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest { (request, error) in

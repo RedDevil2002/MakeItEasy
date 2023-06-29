@@ -18,21 +18,10 @@ struct SettingView: View {
     @State private var showLoadingProductImages = false
     @State private var currentItem = 0
     @State private var currentImage = 0
+    @AppStorage("vibration") private var vibration: Bool = true
+    
     var body: some View {
         List {
-//            Button {
-//                Task {
-//                    await deleteAll(of: "Product")
-//                }
-//            } label: {
-//                Label {
-//                    Text("Delete All")
-//                } icon: {
-//                    Image(systemName: "trash.circle.fill")
-//                }
-//                .foregroundColor(.red)
-//            }
-            
             Button {
                 showLoadingProductInfos.toggle()
                 Task {
@@ -44,6 +33,10 @@ struct SettingView: View {
                 } icon: {
                     Image(systemName: "tray.and.arrow.down.fill")
                 }
+            }
+            
+            Toggle(isOn: $vibration) {
+                Text("Vibrate when completing a price change")
             }
         }
         .sheet(isPresented: $showLoadingProductInfos) {
